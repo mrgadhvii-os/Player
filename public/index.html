@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ox Player - Welcome</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #00ff9d, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature {
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature i {
+            font-size: 2rem;
+            color: #00ff9d;
+            margin-bottom: 1rem;
+        }
+
+        .feature h3 {
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #00ff9d, #00ccff);
+            color: #1a1a1a;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 255, 157, 0.3);
+        }
+
+        .url-input {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .url-input input {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .url-input input:focus {
+            outline: 2px solid #00ff9d;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .url-examples {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            text-align: left;
+        }
+
+        .url-examples h3 {
+            color: #00ff9d;
+            margin-bottom: 1rem;
+        }
+
+        .url-examples ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .url-examples li {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .url-examples li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: #00ff9d;
+        }
+
+        .url-input input {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            width: 100%;
+            max-width: none;
+        }
+
+        .url-input input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ox Player</h1>
+        <p>A modern, feature-rich video player for your media</p>
+        
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-film"></i>
+                <h3>Modern Player</h3>
+                <p>Sleek interface with advanced controls</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-cog"></i>
+                <h3>Quality Options</h3>
+                <p>Multiple quality settings</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-keyboard"></i>
+                <h3>Shortcuts</h3>
+                <p>Keyboard controls for easy navigation</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-stream"></i>
+                <h3>HLS Support</h3>
+                <p>Stream m3u8 and Classplus content</p>
+            </div>
+        </div>
+
+        <div class="url-examples">
+            <h3>Supported URL Types:</h3>
+            <ul>
+                <li>Regular video URLs (.mp4, .webm, etc.)</li>
+                <li>HLS streams (.m3u8)</li>
+                <li>Classplus URLs (automatically processed)</li>
+            </ul>
+        </div>
+
+        <a href="/player?url=https://www.sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4" class="button">
+            Watch Sample Video
+        </a>
+
+        <div class="url-input">
+            <input type="text" id="videoUrl" placeholder="Enter video URL here (supports regular video, m3u8, or Classplus URLs)..." />
+            <button onclick="playVideo()" class="button">Play</button>
+        </div>
+    </div>
+
+    <script>
+        function playVideo() {
+            const url = document.getElementById('videoUrl').value.trim();
+            if (url) {
+                // Decode first in case it's already encoded, then encode properly
+                const decodedUrl = decodeURIComponent(url);
+                // Use encodeURIComponent only for non-Classplus URLs
+                if (decodedUrl.includes('classplusapp.com')) {
+                    window.location.href = `/player?url=${decodedUrl}`;
+                } else {
+                    window.location.href = `/player?url=${encodeURIComponent(decodedUrl)}`;
+                }
+            }
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('videoUrl').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                playVideo();
+            }
+        });
+    </script>
+</body>
+</html> 
