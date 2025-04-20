@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ox Player - Modern Video Player</title>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
+    <style>
+        :root {
+            --plyr-color-main: #00ff9d;
+            --plyr-video-background: #000;
+            --plyr-menu-background: rgba(26, 26, 26, 0.9);
+            --plyr-menu-color: #fff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .player-wrapper {
+            width: 100%;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            text-align: center;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #00ff9d, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .error-message {
+            color: #ff4444;
+            text-align: center;
+            padding: 1rem;
+            display: none;
+            background: rgba(255, 68, 68, 0.1);
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            margin-top: 1rem;
+        }
+
+        .quality-selector {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 0.5rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .plyr--video {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        /* Modern scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--plyr-color-main);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00cc7d;
+        }
+
+        /* Loading animation */
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .loading:after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 4px solid #ffffff;
+            border-top: 4px solid var(--plyr-color-main);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ox Player</h1>
+        <div class="player-wrapper">
+            <video id="player" playsinline controls crossorigin>
+                Your browser does not support the video tag.
+            </video>
+            <div class="loading" id="loading"></div>
+            <div class="error-message" id="errorMessage">
+                Error loading video. Please check the URL and try again.
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const video = document.getElementById('player');
+            const errorMessage = document.getElementById('errorMessage');
+            const loading = document.getElementById('loading');
+            const urlParams = new URLSearchParams(window.location.search);
+            const videoUrl = urlParams.get('url');
+
+            // Initialize Plyr
+            const player = new Plyr(video, {
+                controls: [
+                    'play-large',
+                    'play',
+                    'progress',
+                    'current-time',
+                    'duration',
+                    'mute',
+                    'volume',
+                    'captions',
+                    'settings',
+                    'pip',
+                    'airplay',
+                    'fullscreen'
+                ],
+                settings: ['captions', 'quality', 'speed', 'loop'],
+                quality: {
+                    default: 720,
+                    options: [4320, 2880, 2160, 1440, 1080, 720, 480, 360, 240]
+                },
+                speed: {
+                    selected: 1,
+                    options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
+                }
+            });
+
+            async function handleClassplusUrl(url) {
+                try {
+                    loading.style.display = 'block';
+                    const decodedUrl = decodeURIComponent(url);
+                    const response = await fetch(`/api/classplus?url=${decodedUrl}`);
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch Classplus URL');
+                    }
+                    
+                    const data = await response.json();
+                    console.log('API Response:', data);
+                    
+                    if (!data.url) {
+                        throw new Error('No URL found in API response');
+                    }
+                    
+                    return data.url;
+                } catch (error) {
+                    console.error('Error fetching Classplus URL:', error);
+                    errorMessage.textContent = 'Error processing Classplus URL. Please try again.';
+                    errorMessage.style.display = 'block';
+                    loading.style.display = 'none';
+                    throw error;
+                }
+            }
+
+            async function initializePlayer(url) {
+                try {
+                    loading.style.display = 'block';
+                    errorMessage.style.display = 'none';
+
+                    // Check if it's a Classplus URL
+                    let finalUrl = url;
+                    if (url.includes('classplusapp.com')) {
+                        console.log('Processing Classplus URL...');
+                        finalUrl = await handleClassplusUrl(url);
+                        console.log('Received final URL:', finalUrl);
+                    }
+
+                    // Check if it's an encrypted video (contains *)
+                    if (finalUrl.includes('*')) {
+                        console.log('Processing encrypted video...');
+                        const proxyUrl = `/api/appx-video?url=${encodeURIComponent(finalUrl)}`;
+                        video.src = proxyUrl;
+                        video.addEventListener('loadeddata', () => {
+                            loading.style.display = 'none';
+                        });
+                        return;
+                    }
+
+                    // Handle HLS (m3u8) streams
+                    if (finalUrl.includes('.m3u8')) {
+                        if (Hls.isSupported()) {
+                            const hls = new Hls({
+                                maxLoadingDelay: 4,
+                                maxRetryCount: 8,
+                                debug: false
+                            });
+                            
+                            hls.on(Hls.Events.ERROR, function (event, data) {
+                                if (data.fatal) {
+                                    console.error('HLS Error:', data);
+                                    errorMessage.textContent = 'Error loading stream. Please try again.';
+                                    errorMessage.style.display = 'block';
+                                    loading.style.display = 'none';
+                                }
+                            });
+
+                            hls.loadSource(finalUrl);
+                            hls.attachMedia(video);
+                            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                                loading.style.display = 'none';
+                                video.play().catch(() => {
+                                    console.log('Autoplay prevented');
+                                });
+                            });
+                        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                            // For Safari
+                            video.src = finalUrl;
+                            video.addEventListener('loadedmetadata', () => {
+                                loading.style.display = 'none';
+                                video.play().catch(() => {
+                                    console.log('Autoplay prevented');
+                                });
+                            });
+                        }
+                    } else {
+                        // For regular videos, use our proxy
+                        const proxyUrl = `/api/video-proxy?url=${encodeURIComponent(finalUrl)}`;
+                        video.src = proxyUrl;
+                        video.addEventListener('loadeddata', () => {
+                            loading.style.display = 'none';
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error initializing player:', error);
+                    errorMessage.style.display = 'block';
+                    loading.style.display = 'none';
+                }
+            }
+
+            if (videoUrl) {
+                initializePlayer(videoUrl);
+
+                // Event listeners
+                video.addEventListener('error', () => {
+                    loading.style.display = 'none';
+                    errorMessage.style.display = 'block';
+                });
+
+                // Add keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    switch(e.key.toLowerCase()) {
+                        case 'k':
+                        case ' ':
+                            player.togglePlay();
+                            e.preventDefault();
+                            break;
+                        case 'f':
+                            player.toggleFullscreen();
+                            e.preventDefault();
+                            break;
+                        case 'm':
+                            player.toggleMute();
+                            e.preventDefault();
+                            break;
+                        case 'arrowleft':
+                            player.rewind(10);
+                            e.preventDefault();
+                            break;
+                        case 'arrowright':
+                            player.forward(10);
+                            e.preventDefault();
+                            break;
+                    }
+                });
+            } else {
+                errorMessage.textContent = 'No video URL provided. Use ?url= parameter to specify a video.';
+                errorMessage.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html> 
